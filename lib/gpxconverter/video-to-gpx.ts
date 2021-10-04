@@ -4,14 +4,10 @@ import { execSync } from 'child_process'
 import { TEMP_DIR } from './constants'
 import { getFileNameWithoutExt } from './filename'
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export async function createGpxFileFromVideo(videoPath: string) {
   ensureDir()
-  if (fs.existsSync(`${TEMP_DIR}/${getFileNameWithoutExt(videoPath)}.gpx`)) {
-    return `${TEMP_DIR}/${getFileNameWithoutExt(videoPath)}.gpx`
+  if (existsGpxFile(videoPath)) {
+    return gpxPathFor(videoPath)
   }
   const binFile = await extractGpsBin(videoPath)
   await sleep(1000)
@@ -22,6 +18,15 @@ export async function createGpxFileFromVideo(videoPath: string) {
     }
   })
   return gpxFilePath
+}
+
+function existsGpxFile(videoPath: string) {
+  const expectedGpxPath = gpxPathFor(videoPath)
+  return fs.existsSync(expectedGpxPath)
+}
+
+function gpxPathFor(otherFilePath: string) {
+  return `${TEMP_DIR}/${getFileNameWithoutExt(otherFilePath)}.gpx`
 }
 
 function ensureDir() {
@@ -40,9 +45,12 @@ async function extractGpsBin(fromFile: string) {
   return outFile
 }
 
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 async function createGpx(binFile: string) {
-  const fn = getFileNameWithoutExt(binFile)
-  const gpxFile = `${TEMP_DIR}/${fn}.gpx`
+  const gpxFile = gpxPathFor(binFile)
   const gopro = path.resolve('./bin/gopro')
   execSync(`${gopro} -i ${binFile} -o ${gpxFile}`)
   return gpxFile

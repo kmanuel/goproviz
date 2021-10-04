@@ -1,6 +1,7 @@
 import * as L from 'leaflet'
 import React, { useRef } from 'react'
 import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { rideHasTrack } from '../lib/ride-util'
 import { RideData } from '../types'
 import RideTrack from './RideTrack'
 
@@ -24,11 +25,10 @@ const RideMap = ({ ride, agentProgressSeconds = 0 }: CleanTrackProps) => {
   if (typeof window === 'undefined') {
     return null
   }
-  const track = ride.tracks?.[0]
-  const pointCount = track.points?.length || 0
-  if (pointCount <= 0) {
+  if (!rideHasTrack(ride)) {
     return null
   }
+  const track = ride.tracks?.[0]
   const agentPositionTime = getAgentProgress(
     track.points[0].time,
     agentProgressSeconds

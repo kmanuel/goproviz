@@ -1,15 +1,23 @@
 import * as fs from 'fs'
-import gpxParser from 'gpxparser'
 import { TEMP_DIR } from './constants'
 import { getFileNameWithoutExt } from './filename'
+import { calculatePointsBounds } from './bounds'
+import { readGpxTracks } from './gpx-file-parser'
 
 export function toGpsData(gpxFile: string) {
-  if (existsJsonFile(gpxFile)) {
-    return parseJsonFile(gpxFile)
+  let gpsData = getCachedData(gpxFile)
+  if (!gpsData) {
+    gpsData = readGpxFile(gpxFile)
+    saveTempJson(gpsData, gpxFile)
   }
-  const gpsData = readGpxFile(gpxFile)
-  saveTempJson(gpsData, gpxFile)
   return gpsData
+}
+
+function getCachedData(gpxFile: string) {
+  if (!existsJsonFile(gpxFile)) {
+    return null
+  }
+  return parseJsonFile(gpxFile)
 }
 
 function existsJsonFile(gpxFile: string) {
@@ -28,33 +36,12 @@ function parseJsonFile(gpxFile: string) {
 }
 
 function readGpxFile(gpxFile: string) {
-  const gpxData = fs.readFileSync(gpxFile, 'utf-8')
-  const gpx = new gpxParser()
-  gpx.parse(gpxData)
-  const gpxBounds = calculateGpxBounds(gpx)
-  const tracks = gpx.tracks.map((t: any) => ({ points: t.points }))
+  const tracks = readGpxTracks(gpxFile)
+  const firstTrack = tracks?.[0]
+  const points = firstTrack.points
+  const gpxBounds = calculatePointsBounds(points)
   const gpsData = { tracks, bounds: gpxBounds }
   return gpsData
-}
-
-function calculateGpxBounds(gpx: gpxParser) {
-  const gpxBounds = { latMin: -1, latMax: -1, lonMin: -1, lonMax: -1 }
-  for (let point of gpx.tracks[0].points) {
-    const { lat, lon } = point
-    if (lat < gpxBounds.latMin || gpxBounds.latMin === -1) {
-      gpxBounds.latMin = lat
-    }
-    if (lat > gpxBounds.latMax) {
-      gpxBounds.latMax = lat
-    }
-    if (lon < gpxBounds.lonMin || gpxBounds.lonMin === -1) {
-      gpxBounds.lonMin = lon
-    }
-    if (lon > gpxBounds.lonMax) {
-      gpxBounds.lonMax = lon
-    }
-  }
-  return gpxBounds
 }
 
 async function saveTempJson(gpsData: any, gpxFile: string) {

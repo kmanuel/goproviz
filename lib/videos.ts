@@ -1,25 +1,34 @@
 import * as fs from 'fs'
+import { RideData, RideEntryMap } from '../types'
 import { createGps } from './gpxconverter/video-processor'
-import { RideData } from '../../shared/types'
 
 const RIDES_DIR = process.env.VIDEO_DIR
 
-export interface RideEntry {
-  title: string
-  videoFile: string
-  thumbnail: string
-  created: number
+export const getRidesWithData = async () => {
+  const dir = RIDES_DIR
+  return await getRidesWithDataFrom(dir)
 }
 
-export interface RideEntryMap {
-  [key: string]: RideEntry
-}
-
-export const getRides = async () => {
-  const fileInRidesDir = fs.readdirSync(RIDES_DIR)
+export async function getRidesWithDataFrom(dir: string) {
+  const fileInRidesDir = fs.readdirSync(dir)
   const rides = toRidesEntryMap(fileInRidesDir)
   const allRides = await toRidesListWithRideData(rides)
   return allRides
+}
+
+export async function getRidesFrom(dir: string) {
+  const fileInRidesDir = fs.readdirSync(dir)
+  const rides = toRidesEntryMap(fileInRidesDir)
+  const ridesList = toList(rides)
+  return ridesList
+}
+
+function toList(rides: RideEntryMap) {
+  let rideList = []
+  for (let ride of Object.keys(rides)) {
+    rideList.push(rides[ride])
+  }
+  return rideList
 }
 
 function toRidesEntryMap(fileInRidesDir: string[]) {

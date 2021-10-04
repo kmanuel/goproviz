@@ -1,4 +1,4 @@
-export interface Point {
+export interface TrackPoint {
   lat: number
   lon: number
   ele: number
@@ -13,7 +13,7 @@ export interface TrackBounds {
 }
 
 export interface Track {
-  points: Point[]
+  points: TrackPoint[]
   bounds: TrackBounds
 }
 
@@ -29,4 +29,26 @@ export interface RideData {
   videoUrl: string
   tracks: Track[]
   bounds: Bounds
+}
+
+export interface GpxPoint {
+  lat: number
+  lon: number
+  ele: number
+  time: string
+}
+
+export interface GpxTrack {
+  points: GpxPoint[]
+}
+
+export interface RideEntry {
+  title: string
+  videoFile: string
+  thumbnail: string
+  created: number
+}
+
+export interface RideEntryMap {
+  [key: string]: RideEntry
 }
