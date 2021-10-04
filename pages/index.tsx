@@ -4,11 +4,12 @@ import 'leaflet/dist/leaflet.css'
 import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
 import * as React from 'react'
-import { getRides, RideEntry } from '../lib/videos'
+import { getRidesWithData } from '../lib/videos'
 import Drawer from '../src/Drawer'
 import Header from '../src/Header'
 import VideoList from '../src/VideoList'
-import { RideData } from '../types'
+import { RideData, RideEntry } from '../types'
+
 const Map = dynamic(() => import('../src/Map'), { ssr: false })
 
 interface VideosProps {
@@ -52,7 +53,7 @@ export default function Videos({ rides }: VideosProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const rides = await getRides()
+  const rides = await getRidesWithData()
   return {
     props: {
       rides: rides,
