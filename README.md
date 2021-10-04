@@ -11,4 +11,5 @@ View your GoPro videos on a map to easily select and view videos in a certain lo
 ## Requirements
 
 - ports 3000 and 5000 must be available
+- requires ffmpeg on your system
 - only tested on Ubuntu, on other systems you might need to compile gopro.go (located in the bin directory) for your own platform
