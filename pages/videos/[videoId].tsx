@@ -3,19 +3,21 @@ import Container from '@mui/material/Container'
 import 'leaflet/dist/leaflet.css'
 import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
-import * as React from 'react'
-import { getRides, RideEntry } from '../lib/videos'
-import Drawer from '../src/Drawer'
-import Header from '../src/Header'
-import VideoList from '../src/VideoList'
-import { RideData } from '../types'
-const Map = dynamic(() => import('../src/Map'), { ssr: false })
+import React from 'react'
+import { getRideData, getRides, RideEntry } from '../../lib/videos'
+import Drawer from '../../src/Drawer'
+import Header from '../../src/Header'
+import RideVideo from '../../src/RideVideo'
+import VideoList from '../../src/VideoList'
+import { RideData } from '../../types'
+const RideMap = dynamic(() => import('../../src/RideMap'), { ssr: false })
 
 interface VideosProps {
-  rides: (RideData & RideEntry)[]
+  ride: RideData
+  rides: RideEntry[]
 }
 
-export default function Videos({ rides }: VideosProps) {
+export default function Videos({ ride, rides }: VideosProps) {
   const [open, setOpen] = React.useState(true)
 
   return (
@@ -40,10 +42,13 @@ export default function Videos({ rides }: VideosProps) {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <div style={{ height: '500px' }}>
+            <RideMap ride={ride} />
+          </div>
           <div>
-            <div style={{ height: '800px' }}>
-              <Map rides={rides} />
-            </div>
+            <RideVideo
+              videoUrl={`${process.env.NEXT_PUBLIC_VIDEO_HOST}/${ride.title}.MP4`}
+            />
           </div>
         </Container>
       </Box>
@@ -51,11 +56,14 @@ export default function Videos({ rides }: VideosProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const videoId = context.params?.videoId
+  const ride = await getRideData(videoId as string)
   const rides = await getRides()
   return {
     props: {
-      rides: rides,
+      ride,
+      rides,
     },
   }
 }

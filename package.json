@@ -3,18 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"VIDEO_DIR=$VIDEO_DIR next dev\" \"serve $VIDEO_DIR\"",
     "build": "next build",
-    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.4.0",
+    "@emotion/react": "^11.4.1",
+    "@emotion/server": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
+    "@mui/icons-material": "^5.0.1",
+    "@mui/material": "^5.0.2",
+    "@types/serve-static": "^1.13.10",
+    "axios": "^0.22.0",
+    "concurrently": "^6.3.0",
+    "date-fns": "^2.24.0",
+    "finalhandler": "^1.1.2",
+    "gpxparser": "^3.0.8",
+    "leaflet": "^1.7.1",
     "next": "11.1.2",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-leaflet": "^3.2.1",
+    "react-player": "^2.9.0",
+    "serve-static": "^1.14.1"
   },
   "devDependencies": {
+    "@types/finalhandler": "^1.1.1",
+    "@types/leaflet": "^1.7.5",
     "@types/react": "17.0.25",
+    "@types/react-leaflet": "^2.8.2",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",
     "typescript": "4.4.3"
